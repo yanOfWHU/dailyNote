@@ -1,5 +1,7 @@
 *.log
 *.temp
 *.iml
+*.apk
+*.xml
 target/*
 .idea/*
