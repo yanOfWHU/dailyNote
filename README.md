@@ -1,0 +1,2 @@
+# dailyNote
+work daily note
