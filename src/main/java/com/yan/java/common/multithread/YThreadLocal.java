@@ -32,12 +32,7 @@ public class YThreadLocal {
       // 不设置初始值 get
       // ThreadLocal <String> internalVar = new ThreadLocal<>();
       // 设置初始值
-      ThreadLocal <String> internalVar = new ThreadLocal<String>(){
-        @Override
-        protected String initialValue() {
-          return Thread.currentThread().getName();
-        }
-      };
+      ThreadLocal <String> internalVar = ThreadLocal.withInitial(() -> Thread.currentThread().getName());
 
       @Override
       public void run() {

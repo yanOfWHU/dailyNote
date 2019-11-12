@@ -3,6 +3,7 @@
 *.iml
 *.apk
 *.xml
+.DS_Store
 target/*
 .idea/*
 python-note/sa_usage/*
