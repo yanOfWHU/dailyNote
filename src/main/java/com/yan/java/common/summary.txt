@@ -1,3 +1,6 @@
+国外的教程网站
+https://www.tutorialspoint.com/tutorialslibrary.htm
+
 jackson: ObjectMapper 解析json字符串
 multithread: 主要是 Runtime.addShutdownHook 保证一定让程序正常关闭
 seniorLambdaUsage: 一种高级lambda的使用
