@@ -1,4 +1,4 @@
-package com.yan.java.common.DesignPatterns.SingletonMode;
+package com.yan.java.common.DesignPatterns.Singleton;
 
 /**
  * Created by yanxujiang on 2019-11-12.
