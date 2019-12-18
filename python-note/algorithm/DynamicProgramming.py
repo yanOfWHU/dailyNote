@@ -1,3 +1,5 @@
+from typing import List
+
 
 class DynamicSolution:
 
@@ -38,6 +40,72 @@ class DynamicSolution:
             cached_memory[i][j] = max(x, y) + list[i][j]
         return cached_memory[i][j]
 
+    def find_longest_common_sequence(self, list1:List, list2:List):
+        """
+        寻找最长公共子序列的长度
+        子序列的任意一个字符都可以在原两个序列中找到
+        且字符的先后顺序和原串一致
+        MaxLen(n, 0) = 0
+        MaxLen(0, n) = 0
+        if list1[x] == list2[y]:
+            MaxLen(x, y) = Max(x-1, y-1) + 1
+        else:
+            MaxLen(x, y) = max(MaxLen(x, y-1), MaxLen(x-1, y))
+        :param list1: 序列1
+        :param list2: 序列2
+        :return: 
+        """
+        len1 = len(list1)
+        len2 = len(list2)
+        cached_memory = [[-1 for i in range(len2 + 1)] for i in range(len1 + 1)]
+        self._max_len(list1, list2, 0, 0, cached_memory)
+        return cached_memory[0][0]
+
+    def _max_len(self, list1, list2, index1, index2, cached_memory):
+        len1 = len(list1)
+        len2 = len(list2)
+        if len1 == 0 or len2 == 0:
+            return 0
+        if cached_memory[index1][index2] != -1:
+            return cached_memory[index1][index2]
+        if len1 == index1 or len2 == index2:
+            cached_memory[index1][index2] = 0
+        elif list1[index1] == list2[index2]:
+            cached_memory[index1][index2] = self._max_len(list1, list2, index1 + 1, index2 + 1, cached_memory) + 1
+        else:
+            cached_memory[index1][index2] = max(
+                self._max_len(list1, list2, index1 + 1, index2, cached_memory),
+                self._max_len(list1, list2, index1, index2 + 1, cached_memory)
+            )
+        return cached_memory[index1][index2]
+
+    def find_longest_increase_sequence(self, list:List):
+        """
+        在一个序列中 寻找最长递增序列
+        输出最长递增序列的长度
+        max_len(n) 初始值都为 1
+        max_len(x) = max(max_len(y)) + 1 ; 其中 y < x 且 list[y] <= list[x], 如果不存在这样的 y, 则为 1
+        使用非递归模式，2 层便利
+        每层循环都循环设置 max_len()，为其值加 1
+        :param list:
+        :return:
+        """
+        if list is None or len(list) == 0:
+            return 0
+        cached_memory = [1 for i in range(len(list))]
+        return self._max_increase_len(list, 0, cached_memory)
+
+    def _max_increase_len(self, list, index, cached_memory):
+        _INDEX = index
+        while _INDEX < len(list):
+            tmp = _INDEX + 1
+            while tmp < len(list):
+                if list[_INDEX] < list[tmp]:
+                    cached_memory[tmp] = max(cached_memory[tmp], cached_memory[_INDEX] + 1)
+                tmp = tmp + 1
+            _INDEX = _INDEX + 1
+        return max(cached_memory.__iter__())
+
 if __name__ == '__main__':
     ds = DynamicSolution()
     print("计算三角形自顶向下的最长路径")
@@ -58,5 +126,18 @@ if __name__ == '__main__':
     list[4][3] = 6
     list[4][4] = 5
     print("list: %r" % list)
-    print(ds.find_max_count_path_in_triangle(list))
+    print("最长路径: %d" % ds.find_max_count_path_in_triangle(list))
+
+    print("计算最长公共子序列的长度")
+    list1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    list2 = [1, 0, 2, 4, 5, 6, 3, 7, 10, 9, 8, 11, 15, 14, 12, 20, 13, 19, 16, 17, 18, 21, 22, 23]
+    print("list1: %r" % list1)
+    print("list2: %r" % list2)
+    print("maxCommonSubSequenceLen %d" % ds.find_longest_common_sequence(list1, list2))
+
+    print("最长递增序列")
+    increase_list = [2, 3, 4, 0 ,6, 1, -1, 7, 8, 9, 10, -5, 7, 8, 9, 10, 11, 12, 13 ,14 ,12, 15]
+    # increase_list = [  1, 10, -5, 7,  11]
+    print('list: %r' % increase_list)
+    print("maxIncreaseSequenceLen %d" % ds.find_longest_increase_sequence(increase_list))
 

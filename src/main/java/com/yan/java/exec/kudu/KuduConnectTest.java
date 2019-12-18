@@ -10,8 +10,8 @@ import java.util.Set;
 public class KuduConnectTest {
   public static void main(String[] args) throws Exception{
     Properties props = new Properties();
-    props.put("kudu_master","debugbox313.sa:7051");
-    props.put("table_name", "event_wos_p1");
+    props.put("kudu_master","ip:7051");
+    props.put("table_name", "table_name");
     MyKuduClient client = new MyKuduClient();
     client.init(false,props);
     //operation
