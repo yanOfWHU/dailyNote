@@ -1,5 +1,10 @@
 package com.yan.java;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yan.java.common.jackson.Conf;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -9,6 +14,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
@@ -29,6 +35,13 @@ public class MainTest {
 
     System.out.println(System.currentTimeMillis());
     System.out.println(new Date().getTime());
+
+    Person p = new Person("yxj", null);
+    ObjectNode objectNode = Conf.DEFAULT_OBJECT_MAPPER.createObjectNode();
+    objectNode.put("name", Optional.ofNullable(p.getName()).orElse(null));
+    objectNode.put("age", Optional.ofNullable(p.getAge()).orElse(null));
+    System.out.println(objectNode.toString());
+
   }
 
   private static void print(String str, Integer integer){
@@ -41,4 +54,12 @@ public class MainTest {
     biConsumer.accept("testStr", 1);
     System.out.println("2");
   }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Person {
+  String name;
+  String age;
 }

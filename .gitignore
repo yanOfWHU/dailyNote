@@ -8,3 +8,4 @@ target/*
 .idea/*
 python-note/sa_usage/*
 src/main/java/sa_usage
+working_doc/*

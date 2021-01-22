@@ -1,0 +1,54 @@
+find 命令
+规则: file options args
+        通常是 find path rule ruleContent options
+              path 为需要寻找的路径 通常是 /(跟目录) .(当前目录) ~(用户目录)
+              rule: -name -iname -type -path -regex -maxdepth -mindepth 等等
+              ruleContent: 跟 rule 相关
+              options: -print -delete -perm -group -user -size -atime -amin -newer -exec 等等
+        如 find . -name "*.txt" -print 寻找当前目录下的所有以 .txt 结尾的文件并且打印
+以下只是按照日常常用操作列举, find 命令选项和参数非常多:
+
+列出当前目录下所有文件和目录
+find .
+
+在当前目录下查找以 .java 结尾的所有文件
+find . -name "*.java"
+     find . -name ! "*.java" 找到不以 .java 结尾的文件
+在当前用户目录下查找名字包含 "job" 或 "work"(不区分大小写) 的所有目录和文件
+find ~ -iname "*job*" -o -iname "*job*"
+
+正则匹配搜索当前目录下以 .java .c .cpp(不区分大小写) 结尾的所有文件
+find . -iregex ".*\(.java\|.c\|.cpp\)$"
+
+寻找当前目录下路径中包含 plan 且文件类型为文件夹的所有文件
+find . -path "*plan*" -type d
+    type: f 普通文件 l 符号连接 d 目录
+          c 字符设备 b 块设备   s 套接字  p FIFO
+
+寻找用户目录下, 路径包含 "tmp" 且深度最高为 3 的所有普通文件
+find ~ -maxdepth 3 -path "*tmp*" -type f
+
+寻找当前目录下,修改事件(modify time)/访问时间(access time)/变化时间(change time)在7天之内的所有文件
+find ~ -mtime -7 -atime -7 -ctime -7
+    (-7 表示七天之内，7 表示恰好七天，+7 表示超过七天, 此类似含义可类比使用)
+
+寻找 10 分钟之内访问过或者修改过或者变化过的所有 txt 文件
+find . -name "*.txt" \( -cmin -10 -o -mmin -10 -o -amin -10 \)
+
+寻找当前目录下"修改时间"比 tmp.txt 更长的所有普通文件
+find . -type f -newer tmp.txt
+
+寻找当前大小大于 10K 的所有普通文件
+find . -type f -size "+10k"
+    文件大小单元
+      b:block 块(512字节)
+      c:字节
+      w:字 2字节
+      k:千字节
+      M:兆
+      G:1000M
+
+删除当前目录下所有 tmp 结尾的普通文件
+find . -name "*.tmp" -delete
+
+

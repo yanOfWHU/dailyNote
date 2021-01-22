@@ -1,0 +1,68 @@
+https://www.keycdn.com/blog/vim-commands
+https://www.openvim.com/
+2 种模式：insert 和 normal(command)
+normal 模式：
+1、basic movement
+  h j k l
+  h 左 j 下 k 上 l 右
+2、word movement
+  w 光标跳转到下一个单词的首字母
+  b 跳转到当前 word 的首字母(beginning)
+  e 跳转到当前 word 的尾字母(end)
+3、number powered movement
+  数字 + basic movement / word movement
+  如 3 w，跳转到下三个单词的首字母
+  如 5b 跳转到上五个单词的首字母
+4、insert text repeatedly
+  如，要输出 30个'-'
+  30i- ESC (即按5个键，'3' '0' 'i' '-' 'ESC')
+5、find a character 找到一个字符 char(只能在当前一行字符串中查询，不是全文查询)
+  f: 当前位置找下一个 char
+  F: 当前位置找上一个 char
+  如 fa 寻找下一个 'a'
+  同样可以结合数字使用
+  3fa 寻找当前位置的下三个 'a'
+6、在用括号如 '[' '{' '('嵌套的内容中
+  'shift' + '%'
+  如果当前光标处于非括号位置且所在行有括号，迅速移动到最近的括号位置
+  如果当前光标已经处于括号位置，再次按这两个键，或移动到该括号对应的另一个括号位置
+7、移动光标到当前行的行首和行尾
+  0 移动到行首
+  $(shift + 4) 移动到行尾
+8、移动到下一个/上一个出现的单词位置 * #
+  当前光标值会有一个对应的单词
+  *(shift+8) 表示移动到下一个 occurrence
+  #(shift+3) 表示移动到上一个 occurrence
+9、goto lines
+  G 移动到文件最末行
+  gg 最懂到文件第一行
+  number + G 移动到文件第 number 行
+  如 4G 移动到第四行
+10、搜索(以当前位置为基准搜索)
+  / + content
+  n 移动到搜索到的下一个内容
+  N 移动到搜索到的上一个内容
+11、新起一空行插入
+  o 当前位置下面新起一行插入
+  O 当前位置上面新起一行插入
+12、x X 删除字符
+  x 删除当前光标字符，且光标向前移动一位
+  X 删除当前光标的上一个字符，光标不动
+13、替代当前字符 r
+  'r' + 'replace char'
+  'r' + 'a' 将当前光标的字符替换为 'a'
+14、删除 d 可以结合数字和 word movement 使用
+  dw 删除当前当前光标及之后的第一个单词
+  de / db / d2w d2b d3e
+  dd 删除当前行
+  删除的内容会赋值在粘贴板里面，可以使用 'p' 直接粘贴刚才删除的内容
+  如移动当前行到第 11 行位置的话: dd -> 10G -> p
+15、重复上一个命令 .
+  如，上一个命令用了 dw 删除一个单词，继续删除可以按 '.' 而不需要在按 dw
+
+visual mode
+ v 进入 visual 模式
+ 可以使用光标移动和单词移动选中一些字符 而后做别的操作，如替换r、删除d
+
+
+

@@ -1,0 +1,49 @@
+命令行操作快捷键
+Ctrl(^) +
+    a   跳转到行首
+    e   跳转到行尾
+    h   退格 相当于 backspace
+    u   删除光标之前的所有字符
+    k   删除光标之后的所有字符
+    c   取消本行输入的命令内容，另起一行
+    f   光标往前(后)移动一个字符(forward)
+    b   光标往后(前)移动一个字符(backward)
+    l   清屏(类似于 iterm2 中的 command+k)
+    p   上一个历史命令(类似于方向键 上)
+    n   下一个历史命令(类似于方向键 下)
+    w   删除从光标位置到当前所处"单词"的开头(单词的定义是没有空格就是单词)
+
+基本命令
+文本编辑 nano(略) vi vim(见后续详情)
+
+目录操作:
+mkdir   创建目录    mkdir dir
+rmdir   删除目录    rmdir dir
+mvdir   移动目录    mvdir dir1 dir2
+cd      改变当前目录 cd absolutePath 或 cd relativePath(针对于当前路径的相对路径)
+    常用 cd .. 移动到上级目录
+pwd     显示当前目录    print working directory
+ls      显示当前目录的内容
+    常用 ls -l(常用 alias ll='ls -l' 别名)
+    ls -la 显示所有文件信息(包含"."开头的隐藏文件)
+
+文件操作:
+cat     显示文件或者连接文件    cat file
+cp      复制文件或者目录    cp file1 file2
+rm      删除文件或者目录
+        rm file
+        rm -r dir 递归删除文件(rm -rf dir 递归删除且忽略是否删除请求)
+mv      移动文件或者改变文件名字   mv file1 file2
+find    正则匹配找文件
+
+
+
+
+
+
+
+
+
+
+
+

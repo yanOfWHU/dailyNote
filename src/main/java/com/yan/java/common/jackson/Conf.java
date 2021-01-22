@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by yanxujiang on 2019-10-14
@@ -42,5 +46,28 @@ public class Conf {
     System.out.println(name1);
 
     System.out.println(obj);
+
+    ObjectNode dataNode = DEFAULT_OBJECT_MAPPER.createObjectNode();
+    dataNode.put("name", "yan");
+    dataNode.put("age", 10);
+    dataNode.put("id", (Integer) null);
+
+    System.out.println(dataNode.toString());
+    LinkedList<Integer>  list = new LinkedList<>();
+    list.add(1);
+    list.add(2);
+    list.add(3);
+    list.add(4);
+    list.removeLast();
+    System.out.println(list);
+    StringBuilder sb = new StringBuilder("");
+    System.out.println(sb.length());
+    sb.append("agsgdgbd");
+    System.out.println(sb.toString());
+    sb.delete(0, sb.length());
+    System.out.println(sb.toString());
+    sb.append("1rvsdvgs");
+    System.out.println(sb.toString());
+
   }
 }
