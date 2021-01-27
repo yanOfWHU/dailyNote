@@ -1,10 +1,13 @@
 package com.yan.java.common.algorithm.Dynamic;
 
 import com.yan.java.common.util.CommonUtils;
-import lombok.AllArgsConstructor;
 
 import java.util.*;
 
+/**
+ * 最优子结构并不是动态规划独有的一种性质，能求最值的问题大部分都具有这个性质；
+ * 但反过来，最优子结构性质作为动态规划问题的必要条件，一定是让你求最值的。
+ */
 public class Utils {
     /**
      动态规划的模板套路：
@@ -27,7 +30,6 @@ public class Utils {
      解决动态规划问题，不要看不起暴力解法，动态规划最难的就是写出暴力解，即状态转移方程
 
      动态规划的性质：重叠子问题
-
      动态规划问题的解法：
      1、暴力解法，最核心最关键的基础解法
      2、备忘录解法，存储期间重复的数据
@@ -35,10 +37,20 @@ public class Utils {
         3.1 遍历的过程中，所需的状态必须是已经计算出来的。
         3.2 遍历的终点必须是存储结果的那个位置。
 
+     dp 数组的遍历方向？
+     有时候我们会正向遍历、有时候会反向、有时候会斜向遍历。
+     谨记：
+     1、遍历的过程中，所需的状态必须是已经计算出来的。
+     2、遍历的终点必须是存储结果的那个位置。
+
+
      如何获取 dp 的过程？
      比如找零钱，我们要找零钱，肯定不能只获取最少的兑换次数，肯定还需要获取兑换的方式
      {@link DynamicNode} 使用的时候就可以定义 DynamicNode[][] 去定义 dp 了
      */
+
+
+
 
     /**
      * 斐波那契数列
@@ -206,7 +218,7 @@ public class Utils {
             }
             current = dn[i][j];
         }
-         System.out.println("path:" + sb.toString());
+       System.out.println("path:" + sb.toString());
         System.out.println("total square path:");
         for (i = 0; i <= l1; i ++) {
             for (j = 0; j <= l2; j++) {
@@ -217,11 +229,128 @@ public class Utils {
         return dp[l1][l2];
     }
 
+
+    /**
+     * 最长递增子序列的长度
+     *
+     * 考虑 dp[i] 表示的是 num[0 -> i]这个数组的最长递增子序列的长度
+     * 那么 dp[i+1] 和 dp[i] 什么关系呢？？？
+     * 如果 num[i+1] > num[i] 则，dp[i + 1] = dp[i] + 1
+     * 如果 num[i + 1] <= num[i] 呢? 遍历(n) 0 <= n <= i,
+     * 只要 num[n] < num[i + 1] 那么 dp[i + 1] = max(dp[i + 1], dp[n] + 1)
+     *
+     * @param nums 序列数组
+     * @return
+     */
+    public int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+
+        int[] dp = new int[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            dp[i] = 1;
+        }
+
+
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < i; j ++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+        }
+
+        // 遍历所有 dp，获取最大值
+        int result = 0;
+        for (int i = 0; i < nums.length; i++) {
+            result = Math.max(result, dp[i]);
+        }
+        return result;
+    }
+
+    /**
+     * 高楼扔鸡蛋
+     *
+     你将获得 K 个鸡蛋，并可以使用一栋从 1 到 N  共有 N 层楼的建筑。
+
+     每个蛋的功能都是一样的，如果一个蛋碎了，你就不能再把它掉下去。
+
+     你知道存在楼层 F ，满足 0 <= F <= N 任何从高于 F 的楼层落下的鸡蛋都会碎，从 F 楼层或比它低的楼层落下的鸡蛋都不会破。
+
+     每次移动，你可以取一个鸡蛋（如果你有完整的鸡蛋）并把它从任一楼层 X 扔下（满足 1 <= X <= N）。
+
+     你的目标是确切地知道 F 的值是多少。
+
+     无论 F 的初始值如何，你确定 F 的值的最小移动次数是多少？
+
+     K = 1 ，那么至少移动 N 次, 只能线性的去从 1 层开始加楼层扔鸡蛋
+     K = 2 以上，方案肯定是二分法最快，不断的二分法，然后 K 减少，N 减少，当 K 减少到 1 的时候，退化成线性增加次数
+
+     dp[k][n] = {
+        k == 1 ? n : dp[k - 1][ceil n / 2] + 1
+     }
+
+     * @param K 鸡蛋数量
+     * @param N 楼层
+     * @return 确定 F 最小移动次数
+     */
+    public int superEggDrop(int K, int N) {
+        int[][] dp = new int[K + 1][N + 1];
+
+        for (int k = 0; k<=K; k++) {
+            dp[k][0] = 1;
+        }
+
+        dp[1][1] = 1;
+        for (int n = 2; n <= N; n ++) {
+            dp[1][n] = n ;
+        }
+
+        for (int k = 2; k <= K; k++) {
+            dp[k][1] = 1;
+        }
+
+        int log2;
+        for (int k = 2; k <= K; k++) {
+            for (int n = 2; n <= N; n++) {
+                log2 = log2(n);
+                if (k > log2 + 1) {
+                    dp[k][n] = dp[log2][n];
+                } else if (k == log2) {
+                    // 刚好是对数
+                    dp[k][n] = dp[k - 1][n / 2] + 1;
+                } else {
+                    dp[k][n] = dp[k - 1][intDiv2Ceil(n)] + 1;
+                }
+            }
+        }
+
+        return dp[K][N];
+    }
+
+    private int log2(int number) {
+        if (number < 1) {
+            throw new IllegalArgumentException();
+        }
+        return (int)(Math.floor(Math.log(number) / Math.log(2)));
+    }
+
+    private int intDiv2Ceil(int n) {
+        return n % 2 == 0 ?  n / 2 - 1 : (n - 1) / 2;
+    }
+
     public static void main(String[] args) {
         Utils ins = new Utils();
         System.out.println("两个字符串(apple pineapple)的最短编辑距离:" + ins.editDistance("apple", "pineapple") + "---" + ins.editDistanceNonRecursive("apple", "pineapple"));
         System.out.println("两个字符串(apple banana)的最短编辑距离:" + ins.editDistance("apple", "banana") + "---" + ins.editDistanceNonRecursive("apple", "banana"));
         System.out.println(ins.editDistanceNonRecursive("a1","a2"));
+
+        System.out.println("鸡蛋次数2 " + ins.superEggDrop(1, 2));
+        System.out.println("鸡蛋次数2 " + ins.superEggDrop(2, 2));
+        System.out.println("鸡蛋次数3 " + ins.superEggDrop(2, 4));
+        System.out.println("鸡蛋次数3 " + ins.superEggDrop(2, 6));
+        System.out.println("鸡蛋次数2 " + ins.superEggDrop(2, 3));
+        System.out.println("鸡蛋次数4 " + ins.superEggDrop(2, 9));
+        System.out.println("鸡蛋次数4 " + ins.superEggDrop(3, 14));
     }
 
     /**
