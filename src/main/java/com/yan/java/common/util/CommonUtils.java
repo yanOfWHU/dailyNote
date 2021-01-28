@@ -17,6 +17,10 @@ public class CommonUtils {
         return bigger.compareTo(v3) > 0 ? bigger : v3;
     }
 
+    public static void print(Object t) {
+        System.out.println(t.toString());
+    }
+
 
 
 }
