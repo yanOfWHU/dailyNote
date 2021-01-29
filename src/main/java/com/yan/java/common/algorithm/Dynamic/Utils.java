@@ -1,5 +1,7 @@
 package com.yan.java.common.algorithm.Dynamic;
 
+import static com.yan.java.common.util.CommonUtils.print;
+
 import com.yan.java.common.util.CommonUtils;
 
 import java.util.*;
@@ -280,62 +282,261 @@ public class Utils {
 
      你的目标是确切地知道 F 的值是多少。
 
-     无论 F 的初始值如何，你确定 F 的值的最小移动次数是多少？
-
-     K = 1 ，那么至少移动 N 次, 只能线性的去从 1 层开始加楼层扔鸡蛋
-     K = 2 以上，方案肯定是二分法最快，不断的二分法，然后 K 减少，N 减少，当 K 减少到 1 的时候，退化成线性增加次数
-
-     dp[k][n] = {
-        k == 1 ? n : dp[k - 1][ceil n / 2] + 1
-     }
+     //这题居然不可以用二分法，1个鸡蛋和3层，居然需要3次，而不是2次，题目有点问题
+//     无论 F 的初始值如何，你确定 F 的值的最小移动次数是多少？
+//
+//     K = 1 ，那么至少移动 N 次, 只能线性的去从 1 层开始加楼层扔鸡蛋
+//     K = 2 以上，方案肯定是二分法最快，不断的二分法，然后 K 减少，N 减少，当 K 减少到 1 的时候，退化成线性增加次数
+//
+//     dp[k][n] = {
+//        k == 1 ? n : dp[k - 1][ceil n / 2] + 1
+//     }
 
      * @param K 鸡蛋数量
      * @param N 楼层
      * @return 确定 F 最小移动次数
      */
     public int superEggDrop(int K, int N) {
-        int[][] dp = new int[K + 1][N + 1];
+        if (N == 1) return 1;
+        if (N == 2) return 2;
+        if (K == 1) return N;
 
-        for (int k = 0; k<=K; k++) {
-            dp[k][0] = 1;
-        }
+        int[][] dp = new int[K+1][N+1];
 
-        dp[1][1] = 1;
-        for (int n = 2; n <= N; n ++) {
-            dp[1][n] = n ;
-        }
-
-        for (int k = 2; k <= K; k++) {
-            dp[k][1] = 1;
-        }
-
-        int log2;
-        for (int k = 2; k <= K; k++) {
-            for (int n = 2; n <= N; n++) {
-                log2 = log2(n);
-                if (k > log2 + 1) {
-                    dp[k][n] = dp[log2][n];
-                } else if (k == log2) {
-                    // 刚好是对数
-                    dp[k][n] = dp[k - 1][n / 2] + 1;
-                } else {
-                    dp[k][n] = dp[k - 1][intDiv2Ceil(n)] + 1;
-                }
+        for (int k = 0; k<=K;k++) {
+            for (int n = 0; n<=N; n++) {
+                dp[k][n] = Integer.MAX_VALUE;
             }
         }
+        for (int n = 0; n<= N; n ++) {
+            dp[1][n] = n;
+        }
+        return superEggDrop(K, N, dp);
+    }
 
+    private int superEggDrop(int K, int N, int[][]dp) {
+        if (N == 1) return 1;
+        if (N == 2) return 2;
+        if (K == 1) return N;
+        if(dp[K][N] != Integer.MAX_VALUE) return dp[K][N];
+        for (int n = 1; n<= N; n++) {
+            dp[K][n] = Math.min(
+                dp[K][n],
+                Math.max(dp[K][N - n], dp[K - 1][n - 1]) + 1
+            );
+        }
         return dp[K][N];
     }
 
-    private int log2(int number) {
-        if (number < 1) {
-            throw new IllegalArgumentException();
+    /**
+     * 给定一个正整数 n，将其拆分为至少两个正整数的和，并使这些整数的乘积最大化。 返回你可以获得的最大乘积。
+     * @param n
+     * @return
+     */
+    public int integerBreak(int n) {
+        if (n == 1) return 1;
+        if (n == 2) return 1;
+        if (n == 3) return 2;
+        // C 为序列， V 为乘积最大值时，最大的乘积
+        int[] dp = new int[n + 1];
+        // 初始化
+        for (int j = 4; j < n; j++) {
+            dp[j] = j - 1;
         }
-        return (int)(Math.floor(Math.log(number) / Math.log(2)));
+        dp[0] = 1;
+        dp[1] = 1;
+        dp[2] = 1;
+        dp[3] = 2;
+        for (int i = 4; i<= n; i++) {
+            for (int j = 1; j < i; j++) {
+                dp[i] = Math.max(dp[i], Math.max(j, dp[j]) * (i - j));
+            }
+        }
+        LinkedHashMap<Integer, Integer> map = new LinkedHashMap<>();
+        return dp[n];
     }
 
-    private int intDiv2Ceil(int n) {
-        return n % 2 == 0 ?  n / 2 - 1 : (n - 1) / 2;
+    /**
+     * 最长回文子序列的长度
+     * @param s 字符串 s
+     * @return 长度
+     */
+    public int longestPalindromeSubseq(String s) {
+        if (s == null || s.length() == 0) return 0;
+
+        char[] arr = s.toCharArray();
+        int len = arr.length;
+        int[][] dp = new int[len][len];
+        for (int i = 0; i<len;i++) {
+            for(int j = 0; j< len;j++) {
+                dp[i][j] = Integer.MIN_VALUE;
+            }
+        }
+        return longestPalindromeSubseq(arr, dp, 0, len - 1);
+    }
+
+    /**
+     * 这是从上往下的递推方式
+     * @param arr
+     * @param dp
+     * @param from
+     * @param end
+     * @return
+     */
+    private int longestPalindromeSubseq(char[] arr, int[][] dp, int from, int end) {
+        if (dp[from][end] != Integer.MIN_VALUE) return dp[from][end];
+        if (from == end) {
+           dp[from][end] = 1;
+           return 1;
+        }
+        if (from + 1 == end) {
+            if (arr[from] == arr[end]) {
+                dp[from][end] = 2;
+                return 2;
+            } else {
+               dp[from][end] = 1;
+               return 1;
+            }
+        }
+        if (arr[from] == arr[end]) {
+           dp[from][end] = longestPalindromeSubseq(arr, dp, from+1, end-1) + 2;
+           return dp[from][end];
+        } else {
+            dp[from][end] = Math.max(longestPalindromeSubseq(arr, dp, from +1, end), longestPalindromeSubseq(arr, dp, from, end-1));
+            return dp[from][end];
+        }
+    }
+
+    /**
+     * 博弈问题
+     *
+     * 亚历克斯和李用几堆石子在做游戏。偶数堆石子排成一行，每堆都有正整数颗石子 piles[i] 。
+     *
+     * 游戏以谁手中的石子最多来决出胜负。石子的总数是奇数，所以没有平局。
+     *
+     * 亚历克斯和李轮流进行，亚历克斯先开始。 每回合，玩家从行的开始或结束处取走整堆石头。 这种情况一直持续到没有更多的石子堆为止，此时手中石子最多的玩家获胜。
+     *
+     * 假设亚历克斯和李都发挥出最佳水平，当亚历克斯赢得比赛时返回 true ，当李赢得比赛时返回 false 。
+     * count[i][j] 表示从 i->j 玩家最多可以得到的石头总数 totalCount 表示 i->j 的石头总数
+     * 所以每次在取石头的时候，都需要保证石头取完，对奕者能获得到的石头总数最少
+     * n 堆石头 count[i][j] = max{totalCount - count[i][j-1], totalCount - count[i+1][j-1]}}
+     * 所以上面公式， count[i][j] 表示取头或者取尾，另外一个人能拿到的熟练更少，说明 totalCount - 头/尾 应该最大
+     * 每次都尽可能让他下一次取的时候更少
+     *
+     * 来源：力扣（LeetCode）
+     * 链接：https://leetcode-cn.com/problems/stone-game
+     * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     * @param piles
+     * @return
+     */
+    public boolean stoneGame(int[] piles) {
+        int len = piles.length;
+        int[][] dp = new int[len][len];
+        // dp[i][j] 表示该回合能拿到的最多石头
+        // 一堆石头，i =j， count[i][j] = pipe[i];
+        // 两堆石头 j = i + 1, count[i][j] = max{pile[i], pile[j]}
+        // n 堆石头 count[i][j] = max{totalCount - max{count[i][j-1], count[i+1][j-1]}}
+        if (piles.length == 2 || piles.length == 4) return true;
+        int total = Arrays.stream(piles).reduce(Integer::sum).getAsInt();
+
+        int maxCount = stoneGame(piles, dp, 0, piles.length - 1, total);
+        return maxCount * 2 > total;
+    }
+
+    private int stoneGame(int[] piles, int[][] dp, int from, int end, int total) {
+        if (dp[from][end] != 0) return dp[from][end];
+        if (from == end) {
+            dp[from][end] = piles[from];
+            return dp[from][end];
+        } else if (from +1 == end) {
+            dp[from][end] = Math.max(piles[from], piles[end]);
+            return dp[from][end];
+        }
+        dp[from][end] = Math.max(
+            total - stoneGame(piles, dp, from, end-1, total - piles[end]),
+            total - stoneGame(piles, dp, from+1, end, total - piles[from])
+        );
+        return dp[from][end];
+    }
+
+
+    /**
+     * 正则表达式匹配
+     给你一个字符串 s 和一个字符规律 p，请你来实现一个支持 '.' 和 '*' 的正则表达式匹配。
+
+     '.' 匹配任意单个字符
+     '*' 匹配零个或多个前面的那一个元素
+     所谓匹配，是要涵盖 整个 字符串 s的，而不是部分字符串。
+
+     来源：力扣（LeetCode）
+     链接：https://leetcode-cn.com/problems/regular-expression-matching
+     著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+     * 正则表达式只有 . 和 * 和普通字符，默认正则表达式是正常的
+     *
+     * 这题 . 可以匹配空字符，所以无法 AC，只能过 80% case
+     * 这题最佳方案是使用 NFA 和 DFA 自动机的方式
+     * 将正则匹配字符构建自动机，自动机是一个链表(注意 一定要是链表)
+     * 方式同样是动态规划，不过用的是从左往右匹配的自底向上规划
+     * @param s 匹配字符串
+     * @param p 正则表达式
+     * @return
+     */
+    public boolean isMatch(String s, String p) {
+        if (s == null) return false;
+        if (p == null) return false;
+        char[] arr_s = s.toCharArray();
+        char[] arr_p = p.toCharArray();
+        boolean[][] match = new boolean[arr_s.length][arr_p.length];
+        return isMatch(arr_s, arr_p, s.length() - 1,  p.length() - 1, match);
+    }
+
+    public boolean isMatch(char[] s, char[] p, int f1, int f2, boolean[][] match) {
+        if (f1 == -1) {
+            return judgeMatchEmpty(p, f2);
+        }
+        if (f2 == -1) return false;
+        if (s[f1] == p[f2]) {
+            match[f1][f2] = isMatch(s, p, f1-1, f2-1, match);
+            return match[f1][f2];
+        }
+        if (p[f2] == '.') {
+            match[f1][f2] = isMatch(s, p, f1 - 1, f2 - 1, match) || isMatch(s, p, f1, f2 - 1, match);
+            return match[f1][f2];
+        }
+        if (p[f2] == '*') {
+            // 核心在这里
+            int k = f1;
+            int x = f2 - 1;
+            if (p[x] == '.') {
+                // 说明是可以匹配任何字符串
+                for (int i = f1 - 1; i >= -1; i--) {
+                    match[f1][f2] = match[f1][f2] || isMatch(s, p, i, f2, match) || isMatch(s, p, f1 , f2 -2 , match);
+                    if (match[f1][f2] == true) return true;
+                }
+                return match[f1][f2];
+            }
+            while (s[k] == p[x] ) {
+                match[f1][f2] = match[f1][f2] || isMatch(s, p, k - 1, f2, match) || isMatch(s, p, k - 1, f2 -2 , match);
+                k--;
+                if (match[f1][f2] == true) return true;
+                return match[f1][f2];
+            }
+            // x 和 k 不同
+            return isMatch(s, p, f1, x - 1, match);
+        }
+
+        match[f1][f2] = false;
+        return match[f1][f2];
+    }
+
+    private boolean judgeMatchEmpty(char[] p, int end) {
+        if (end == -1) return true;
+        if (p[end] != '*') return false;
+        for (int i = 1; i < end; i = i + 2) {
+            if (p[i] != '*') return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
@@ -351,6 +552,9 @@ public class Utils {
         System.out.println("鸡蛋次数2 " + ins.superEggDrop(2, 3));
         System.out.println("鸡蛋次数4 " + ins.superEggDrop(2, 9));
         System.out.println("鸡蛋次数4 " + ins.superEggDrop(3, 14));
+
+        System.out.println(ins.integerBreak(14));
+        print(ins.isMatch("a", "..a"));
     }
 
     /**
