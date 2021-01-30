@@ -1,6 +1,7 @@
 package com.yan.java.common.algorithm.BackTracking;
 
 import com.google.common.collect.Lists;
+import com.yan.java.common.util.CommonUtils;
 import lombok.experimental.UtilityClass;
 
 import java.util.*;
@@ -149,9 +150,125 @@ public class Utils {
         return res;
     }
 
+    /**
+     * 简单题目如的判断 ({[]}) 这三种字符组合的字符串 是否是合法的，这题使用 堆 可以简单的实现，不过多实现
+     *
+     * 进阶题目：* 可以任意匹配 () 其中一个,
+     * 一个字符串由 ( ) * 三个字符组成，判断这个字符串是否是合法的括号对
+     * @param s
+     * @return
+     */
+    public boolean isParenthesesLegal(String s) {
+        if (null == s || s.length() == 0) return false;
+
+        char[] arr = s.toCharArray();
+        LinkedList<Character> currentLink = new LinkedList<>();
+
+        for (char ch : arr) {
+            currentLink.add(ch);
+        }
+
+
+        LinkedList<Character> stack = new LinkedList<>();
+
+        return isParenthesesLegal(currentLink, stack);
+    }
+
+    private static boolean isParenthesesLegal(LinkedList<Character> currentLink, LinkedList<Character> stack) {
+        if (currentLink.size() == 0) return stack.isEmpty();
+
+        char push = ' ';
+        char pop = ' ';
+
+        Character ch = currentLink.removeFirst();
+        if (ch == '(') {
+            stack.push(ch);
+            push = ch;
+        } else if (ch == ')') {
+            if (stack.isEmpty() || stack.peek() == ')') {
+                stack.push(ch);
+                push = ch;
+            } else {
+                pop = stack.pop();
+            }
+        } else if (ch == '*') {
+            // image 两种情况
+            boolean result;
+            // 这里匹配 * 回溯法有点细节问题
+
+            // 如果栈是空的
+            if (stack.isEmpty()) {
+                stack.push('(');
+                push = '(';
+                pop = ' ';
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                if (result) return true;
+                stack.push(')');
+                push = ')';
+                pop = ' ';
+                currentLink.removeFirst();
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                return result;
+            }
+
+            // 如果栈不是空的
+            char head = stack.peek();
+            if (head == '(') {
+                stack.push('(');
+                push = '(';
+                pop = ' ';
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                if (result) return result;
+
+                pop = stack.pop();
+                push = ' ';
+                currentLink.removeFirst();
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                return result;
+            } else {
+                // head 是 )
+                stack.push(')');
+                push = ')';
+                pop = ' ';
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                if (result) return result;
+
+                push = '(';
+                pop = ' ';
+                stack.push('(');
+                currentLink.removeFirst();
+                result = isParenthesesLegal(currentLink, stack);
+                trackBack(currentLink, stack, '*', push, pop);
+                return result;
+            }
+        }
+        // track_back() 回退状态
+        boolean result = isParenthesesLegal(currentLink, stack);
+        trackBack(currentLink, stack, ch, push, pop);
+        return result;
+    }
+
+    private static void trackBack(LinkedList<Character> currentLink, LinkedList<Character> stack, char current, char push, char pop) {
+        currentLink.addFirst(current);
+        if (push != ' ') {
+            stack.pop();
+        } else if (pop != ' ') {
+            stack.push(pop);
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println(permutation(Lists.newArrayList('a', 'b', 'c', 'd', 'e')));
         System.out.println(solveNQueens(4));
         System.out.println(missingNumber(new int[]{0, 1, 2, 4}));
+
+        System.out.println("(*(*))" + isParenthesesLegal("(*(*))"));
+        CommonUtils.print("*()()()**)" + isParenthesesLegal("*()()()**)"));
+        CommonUtils.print(")**(" + isParenthesesLegal(")**("));
     }
 }
