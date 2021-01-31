@@ -5,6 +5,7 @@ import static com.yan.java.common.util.CommonUtils.print;
 import com.yan.java.common.util.CommonUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 最优子结构并不是动态规划独有的一种性质，能求最值的问题大部分都具有这个性质；
@@ -228,6 +229,7 @@ public class Utils {
             }
             System.out.println();
         }
+        PriorityQueue
         return dp[l1][l2];
     }
 
@@ -472,9 +474,15 @@ public class Utils {
      链接：https://leetcode-cn.com/problems/regular-expression-matching
      著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
-     * 正则表达式只有 . 和 * 和普通字符，默认正则表达式是正常的
+     正则表达式只有 . 和 * 和普通字符，默认正则表达式是正常的
+
+     bool dp(string& s, int i, string& p, int j) {
+        dp(s, i, p, j + 2) || dp(s, i + 1, p, j) || dp(s, i + 1, p, j + 1);
+     }
+
      *
      * 这题 . 可以匹配空字符，所以无法 AC，只能过 80% case
+     * 这里直接 copy 最佳答案过来
      * 这题最佳方案是使用 NFA 和 DFA 自动机的方式
      * 将正则匹配字符构建自动机，自动机是一个链表(注意 一定要是链表)
      * 方式同样是动态规划，不过用的是从左往右匹配的自底向上规划
@@ -483,61 +491,57 @@ public class Utils {
      * @return
      */
     public boolean isMatch(String s, String p) {
-        if (s == null) return false;
-        if (p == null) return false;
-        char[] arr_s = s.toCharArray();
-        char[] arr_p = p.toCharArray();
-        boolean[][] match = new boolean[arr_s.length][arr_p.length];
-        return isMatch(arr_s, arr_p, s.length() - 1,  p.length() - 1, match);
-    }
-
-    public boolean isMatch(char[] s, char[] p, int f1, int f2, boolean[][] match) {
-        if (f1 == -1) {
-            return judgeMatchEmpty(p, f2);
-        }
-        if (f2 == -1) return false;
-        if (s[f1] == p[f2]) {
-            match[f1][f2] = isMatch(s, p, f1-1, f2-1, match);
-            return match[f1][f2];
-        }
-        if (p[f2] == '.') {
-            match[f1][f2] = isMatch(s, p, f1 - 1, f2 - 1, match) || isMatch(s, p, f1, f2 - 1, match);
-            return match[f1][f2];
-        }
-        if (p[f2] == '*') {
-            // 核心在这里
-            int k = f1;
-            int x = f2 - 1;
-            if (p[x] == '.') {
-                // 说明是可以匹配任何字符串
-                for (int i = f1 - 1; i >= -1; i--) {
-                    match[f1][f2] = match[f1][f2] || isMatch(s, p, i, f2, match) || isMatch(s, p, f1 , f2 -2 , match);
-                    if (match[f1][f2] == true) return true;
+        int m = s.length();
+        int n = p.length();
+        boolean[][] f = new boolean[m + 1][n + 1];
+        f[0][0] = true;
+        for (int i = 0; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (p.charAt(j - 1) == '*') {
+                    f[i][j] = f[i][j - 2];
+                    if (matches(s, p, i, j - 1)) {
+                        f[i][j] = f[i][j] || f[i - 1][j];
+                    }
+                } else {
+                    if (matches(s, p, i, j)) {
+                        f[i][j] = f[i - 1][j - 1];
+                    }
                 }
-                return match[f1][f2];
             }
-            while (s[k] == p[x] ) {
-                match[f1][f2] = match[f1][f2] || isMatch(s, p, k - 1, f2, match) || isMatch(s, p, k - 1, f2 -2 , match);
-                k--;
-                if (match[f1][f2] == true) return true;
-                return match[f1][f2];
-            }
-            // x 和 k 不同
-            return isMatch(s, p, f1, x - 1, match);
         }
-
-        match[f1][f2] = false;
-        return match[f1][f2];
+        return f[m][n];
     }
 
-    private boolean judgeMatchEmpty(char[] p, int end) {
-        if (end == -1) return true;
-        if (p[end] != '*') return false;
-        for (int i = 1; i < end; i = i + 2) {
-            if (p[i] != '*') return false;
+    public boolean matches(String s, String p, int i, int j) {
+        if (i == 0) {
+            return false;
         }
-        return true;
+        if (p.charAt(j - 1) == '.') {
+            return true;
+        }
+        return s.charAt(i - 1) == p.charAt(j - 1);
     }
+
+    /**
+     * 略
+     * 获取从 1 到 n，每个数二进制表示中 1 的个数
+     *
+     * 暴力解法 每个数都去遍历一遍获取 1 的个数
+     *
+     * dp？
+     * dp[n] 和 dp[k] 的关系？
+     *
+     * 略
+     * @param num
+     */
+    public int[] getNumbersOf1(int num) {
+        int[] ret = new int[num + 1];
+        for(int i = 1; i <= num; i++){
+            ret[i] = ret[i&(i-1)] + 1;
+        }
+        return ret;
+    }
+
 
     public static void main(String[] args) {
         Utils ins = new Utils();
@@ -555,6 +559,7 @@ public class Utils {
 
         System.out.println(ins.integerBreak(14));
         print(ins.isMatch("a", "..a"));
+
     }
 
     /**

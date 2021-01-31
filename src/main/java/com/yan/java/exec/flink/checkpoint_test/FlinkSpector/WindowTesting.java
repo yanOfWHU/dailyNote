@@ -60,7 +60,7 @@ public class WindowTesting extends DataStreamTestBase {
      * Add data records to it and retrieve a DataStreamSource
      * by calling .close().
      *
-     * Note: The before and after keywords define the time span !between! the previous
+     * Note.Note: The before and after keywords define the time span !between! the previous
      * record and the current record.
      */
     DataStream<Tuple2<Integer, String>> testStream =

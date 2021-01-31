@@ -1008,7 +1008,7 @@ public class Solution {
   }
 
   /**
-   * @see com.yan.leetcode.editor.cn.Solution#BFSTemplate
+   * @see com.yan.java.common.algorithm.Solution#BFSTemplate(TreeNode, TreeNode)
    * 锁的初始为 0000 每次可以旋转1位置到相邻位置 如 0001 0009 等
    * deadEnd 为旋转到该位置就会出现死锁 无法继续打开锁不可通的道路
    * @param deadEnds
@@ -1080,7 +1080,7 @@ public class Solution {
 
 
   /**
-   * @see com.yan.leetcode.editor.cn.Solution#BFSTemplate
+   * @see com.yan.java.common.algorithm.Solution#BFSTemplate(TreeNode, TreeNode)
    * 给出一个正整数 n 找到若干个完全平方数(1, 4, 9, 16。。。) 使得他们的和等于 n
    * 返回组成和的完全平方数最少的个数
    * 如 25 = 9 + 16 return 2
@@ -1321,7 +1321,100 @@ public class Solution {
     return result;
   }
 
+
+  /**
+   * 大数相乘
+   *
+   * 考虑，两个数相乘，s1 第 i 位和 s2 第 j 位，二者的值会最终落地于结果的第 i + j 到 第 i + j + 1 位
+   *
+   * 那么，设置
+   * @param s1 大数1
+   * @param s2 大数2
+   * @return
+   */
+  public String multiply(String s1, String s2) {
+    if ("0".equals(s1) || "0".equals(s2)) return "0";
+
+    // 计算末尾 0 的数量
+    int c1 = 0;
+    int c2 = 0;
+    int idx = s1.length() - 1;
+    while (s1.charAt(idx) == 48) {
+      c1++;
+      s1 = s1.substring(0, idx--);
+    }
+    idx = s2.length() - 1;
+    while (s2.charAt(idx) == 48) {
+      c2++;
+      s2 = s2.substring(0, idx--);
+    }
+    if (c1 + c2 != 0) {
+      StringBuilder sb = new StringBuilder();
+      for (int i= 0; i < c1 + c2; i++) {
+        sb.append("0");
+      }
+      return multiply(s1, s2) + sb.toString();
+    }
+
+
+
+    List<Integer> arr1 = new ArrayList<>();
+    List<Integer> arr2 = new ArrayList<>();
+    for (int i = 0; i < s1.length(); i++) {
+      arr1.add(s1.charAt(i) - 48);
+    }
+
+    for (int i = 0; i < s2.length(); i++) {
+      arr2.add(s2.charAt(i) - 48);
+    }
+
+    List<Integer> result = new ArrayList<>();
+    for (int i = 0; i < s1.length() + s2.length();i++) {
+      result.add(0);
+    }
+
+    int mul;
+    int idx1;
+    int idx2;
+    // arr1 从右往左计算
+    for (int i = s1.length() - 1; i >= 0; i--) {
+      // arr2 从右往左计算
+      for (int j = s2.length() - 1; j >= 0; j--) {
+        // 获取数的相乘结果
+        mul = arr1.get(i) * arr2.get(j);
+        idx1 = i + j + 1;
+        idx2 =  i + j;
+        int add1 = mul % 10 + result.get(idx1);
+        result.set(idx1, add1 % 10);
+        int add2 = mul / 10 + result.get(idx2) + add1 / 10;
+        result.set(idx2, add2 % 10);
+        while (idx2 != 0) {
+          add2 = add2 / 10 + result.get(idx2 - 1);
+          if (add2 < 10) {
+            result.set(idx2 - 1, add2);
+            break;
+          } else {
+            result.set(idx2 - 1, add2 % 10);
+            idx2--;
+          }
+        }
+      }
+    }
+    int index = 0;
+    while (result.get(index) == 0) {
+      index++;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = index; i < result.size(); i++) {
+      sb.append(result.get(i));
+    }
+    return sb.toString();
+  }
+
   public static void main(String[] args) {
+
+    Solution ins = new Solution();
+
     StringBuilder sb = new StringBuilder();
 
     // 最长回文字符串
@@ -1391,6 +1484,7 @@ public class Solution {
     CommonUtils.print("单调队列");
     System.out.println("滑动窗口最大值" + concat(maxSlidingWindow(new int[]{3,1,2,0,5}, 3)));
 
+    System.out.println("大数相乘 999 * 999 = " + ins.multiply("999", "999"));
   }
 
   private static String concat(int[] arr) {
