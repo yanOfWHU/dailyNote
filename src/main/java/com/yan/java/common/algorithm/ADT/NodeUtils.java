@@ -1,10 +1,7 @@
 package com.yan.java.common.algorithm.ADT;
 
-import lombok.experimental.UtilityClass;
-
 import java.util.*;
 
-@UtilityClass
 public class NodeUtils {
 
     /**
@@ -127,6 +124,53 @@ public class NodeUtils {
         }
 
         return result;
+    }
+
+    /**
+     * 通过中序和前序遍历构建树
+     * @param pre
+     * @param in
+     * @return
+     */
+    public TreeNode reConstructBinaryTree(int [] pre,int [] in) {
+        return construct(pre, 0, pre.length - 1, in, 0, in.length - 1);
+    }
+
+    public TreeNode construct(int [] pre, int f1, int t1, int [] in, int f2, int t2) {
+        if (t1 < f1 || t2 < f2) {
+            return null;
+        }
+
+        if (t1 == f1 || t2 == f2) {
+            return new TreeNode(pre[f1]);
+        }
+        // 根节点是 pre[f1]
+        int f2_f = f2;
+        Set<Integer> left = new HashSet<>();
+        while (f2_f < pre.length && in[f2_f] != pre[f1]) {
+            left.add(in[f2_f]);
+            f2_f++;
+        }
+
+        int f1_f = f1 + 1;
+        while (f1_f < pre.length && left.contains(pre[f1_f])) {
+            f1_f++;
+        }
+
+        // 这时候 pre[f1] == in[f2_f]
+        // 根节点就是 pre[f1]
+        // 左子树为 construct(pre, f1, f1_f - 1, in, f2, f2_f - 1 )
+        // 右子树为 construct(pre, f1_f, t1, in, f2_f, t2)
+
+        TreeNode root = new TreeNode(pre[f1]);
+        root.left = construct(pre, f1 + 1, f1_f - 1, in, f2, f2_f - 1 );
+        root.right = construct(pre, f1_f, t1, in, f2_f, t2);
+        return root;
+    }
+
+    public static void main(String[] args) {
+        NodeUtils ins = new NodeUtils();
+        ins.reConstructBinaryTree(new int[]{1,2,3,4,5,6,7}, new int[]{3,2,4,1,6,5,7});
     }
 
 
